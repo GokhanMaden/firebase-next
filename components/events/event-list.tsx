@@ -11,7 +11,7 @@ const EventList = ({ list }: EventListType) => {
   return (
     <ul>
       {list?.map((event) => (
-        <EventItem event={event} />
+        <EventItem key={event.id} event={event} />
       ))}
     </ul>
   );

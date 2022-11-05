@@ -5,8 +5,6 @@ import { getFeaturedEvents } from '../dummy-data';
 
 function HomePage() {
   const featuredEvents = getFeaturedEvents();
-  console.log('featuredEvents: ', typeof featuredEvents);
-  console.log('featuredEvents: ', featuredEvents);
 
   return (
     <div>
