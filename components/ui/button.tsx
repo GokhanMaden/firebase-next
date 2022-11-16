@@ -5,14 +5,23 @@ import classes from './button.module.css';
 
 type IButton = {
   children: React.ReactNode;
-  link: string;
+  link?: string;
+  onClick?: () => void;
 };
 
-const Button: React.FC<IButton> = ({ children, link }) => {
+const Button: React.FC<IButton> = ({ children, link, onClick }) => {
+  if (link) {
+    return (
+      <Link href={link} className={classes.btn}>
+        {children}
+      </Link>
+    );
+  }
+
   return (
-    <Link href={link} className={classes.btn}>
+    <button className={classes.btn} onClick={onClick}>
       {children}
-    </Link>
+    </button>
   );
 };
 
