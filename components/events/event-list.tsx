@@ -4,14 +4,10 @@ import { IEvent } from '../../types/eventType';
 import EventItem from './event-item';
 import classes from './event-list.module.css';
 
-type EventListType = {
-  list: IEvent[];
-};
-
-const EventList = ({ list }: EventListType) => {
+const EventList = ({ list }: any) => {
   return (
     <ul className={classes.list}>
-      {list?.map((event) => (
+      {list?.map((event: any) => (
         <EventItem key={event.id} event={event} />
       ))}
     </ul>

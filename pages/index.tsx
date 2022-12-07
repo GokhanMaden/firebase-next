@@ -1,40 +1,28 @@
-import fs from 'fs/promises';
-import path from 'path';
-
 import EventList from '../components/events/event-list';
-import { getFeaturedEvents } from '../dummy-data';
+import { getFeaturedEvents } from '../helpers/api-utils';
 
-type ProductType = {
+type EventType = {
   id: string;
-  title: string;
+  title?: string;
 };
 
 interface IHomePage {
-  products: ProductType[];
+  events: EventType[];
 }
-function HomePage({ products }: IHomePage) {
-  const featuredEvents = getFeaturedEvents();
-
+function HomePage({ events }: IHomePage) {
   return (
     <div>
-      <EventList list={featuredEvents} />
-      <ul>
-        {products.map((product) => (
-          <li key={product.id}>{product.title}</li>
-        ))}
-      </ul>
+      <EventList list={events} />
     </div>
   );
 }
 
-export async function getStaticProps() {
-  const filePath = path.join(process.cwd(), 'data', 'dummy-backend.json');
-  const jsonData: any = await fs.readFile(filePath);
-  const data = JSON.parse(jsonData);
+export async function getStaticProps(context: any) {
+  const featuredEvents = await getFeaturedEvents();
 
   return {
     props: {
-      products: data.products,
+      events: featuredEvents,
     },
   };
 }
