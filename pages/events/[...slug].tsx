@@ -1,26 +1,77 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import useSWR from 'swr';
 
-import { getFilteredEvents } from '../../helpers/api-utils';
 import EventList from '../../components/events/event-list';
 import ResultsTitle from '../../components/events/results-title';
 import Button from '../../components/ui/button';
 import ErrorAlert from '../../components/ui/error-alert';
 
-function FilteredEventsPage({ events, hasError, date }: any) {
-  // const filterData = router.query.slug;
+function FilteredEventsPage() {
+  const router = useRouter();
+  const [events, setEvents] = useState<any>([]);
+  const filterData = router.query.slug;
 
-  // if (!filterData) {
-  //   return <p className="center">Loading...</p>;
-  // }
+  const { data, error } = useSWR(
+    'https://nextjs-course-291fe-default-rtdb.firebaseio.com/events.json',
+    (apiURL: string) => fetch(apiURL).then((res) => res.json())
+  );
 
-  // const filteredYear = +filterData[0];
-  // const filteredMonth = +filterData[1];
+  console.log('data: ', data);
 
-  if (hasError) {
-    return <p>Invalid Filter. Please adjust your values!</p>;
+  useEffect(() => {
+    if (data) {
+      const events = [];
+
+      for (const key in data) {
+        events.push({
+          id: key,
+          ...data[key],
+        });
+      }
+
+      setEvents(events);
+    }
+  }, [data]);
+
+  if (!filterData) {
+    return <p className="center">Loading...</p>;
   }
 
-  const filteredEvents = events;
+  const filteredYear = +filterData[0];
+  const filteredMonth = +filterData[1];
+
+  if (
+    isNaN(filteredYear) ||
+    isNaN(filteredMonth) ||
+    filteredYear > 2030 ||
+    filteredYear < 2021 ||
+    filteredMonth < 1 ||
+    filteredMonth > 12 ||
+    error
+  ) {
+    return (
+      <>
+        <div>
+          <ErrorAlert>
+            <p>Invalid Filter. Please adjust your values!</p>
+          </ErrorAlert>
+          <div className="center">
+            <Button link="/events">Show all events</Button>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  let filteredEvents = events.filter((event: any) => {
+    const eventDate = new Date(event.date);
+
+    return (
+      eventDate.getFullYear() === filteredYear &&
+      eventDate.getMonth() === filteredMonth - 1
+    );
+  });
 
   if (!filteredEvents || filteredEvents.length === 0) {
     return (
@@ -35,7 +86,9 @@ function FilteredEventsPage({ events, hasError, date }: any) {
     );
   }
 
-  const selectedDate = new Date(date.year, date.month - 1);
+  const selectedDate = new Date(filteredYear, filteredMonth - 1);
+  console.log('selectedDate: ', selectedDate);
+
   return (
     <>
       <ResultsTitle date={selectedDate} />
@@ -44,48 +97,41 @@ function FilteredEventsPage({ events, hasError, date }: any) {
   );
 }
 
-export async function getServerSideProps(context: any) {
-  const { params } = context;
+// export async function getServerSideProps(context: any) {
+//   const { params } = context;
 
-  const filterData = params.slug;
+//   const filterData = params.slug;
 
-  const filteredYear = +filterData[0];
-  const filteredMonth = +filterData[1];
+//   const filteredYear = +filterData[0];
+//   const filteredMonth = +filterData[1];
 
-  if (
-    isNaN(filteredYear) ||
-    isNaN(filteredMonth) ||
-    filteredYear > 2030 ||
-    filteredYear < 2021 ||
-    filteredMonth < 1 ||
-    filteredMonth > 12
-  ) {
-    return {
-      props: {
-        hasError: true,
-      },
-      // notFound: true,
-      // redirect: {
-      //   destination: '/error'
-      // }
-    };
-  }
+//   if  {
+//     return {
+//       props: {
+//         hasError: true,
+//       },
+//       // notFound: true,
+//       // redirect: {
+//       //   destination: '/error'
+//       // }
+//     };
+//   }
 
-  const filteredEvents = await getFilteredEvents({
-    year: filteredYear,
-    month: filteredMonth,
-  });
+//   const filteredEvents = await getFilteredEvents({
+//     year: filteredYear,
+//     month: filteredMonth,
+//   });
 
-  return {
-    props: {
-      events: filteredEvents,
-      hasError: false,
-      date: {
-        year: filteredYear,
-        month: filteredMonth,
-      },
-    },
-  };
-}
+//   return {
+//     props: {
+//       events: filteredEvents,
+//       hasError: false,
+//       date: {
+//         year: filteredYear,
+//         month: filteredMonth,
+//       },
+//     },
+//   };
+// }
 
 export default FilteredEventsPage;
