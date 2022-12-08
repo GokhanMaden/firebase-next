@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
+import Head from 'next/head';
 
 import EventList from '../../components/events/event-list';
 import ResultsTitle from '../../components/events/results-title';
@@ -17,8 +18,6 @@ function FilteredEventsPage() {
     (apiURL: string) => fetch(apiURL).then((res) => res.json())
   );
 
-  console.log('data: ', data);
-
   useEffect(() => {
     if (data) {
       const events = [];
@@ -34,12 +33,34 @@ function FilteredEventsPage() {
     }
   }, [data]);
 
+  let pageHeadData = (
+    <Head>
+      <title>Filtered Events</title>
+      <meta name="description" content="A list of filtered events" />
+    </Head>
+  );
+
   if (!filterData) {
-    return <p className="center">Loading...</p>;
+    return (
+      <>
+        {pageHeadData}
+        <p className="center">Loading...</p>
+      </>
+    );
   }
 
   const filteredYear = +filterData[0];
   const filteredMonth = +filterData[1];
+
+  pageHeadData = (
+    <Head>
+      <title>Filtered Events</title>
+      <meta
+        name="description"
+        content={`All events for ${filteredYear}/${filteredMonth}`}
+      />
+    </Head>
+  );
 
   if (
     isNaN(filteredYear) ||
@@ -52,6 +73,7 @@ function FilteredEventsPage() {
   ) {
     return (
       <>
+        {pageHeadData}
         <div>
           <ErrorAlert>
             <p>Invalid Filter. Please adjust your values!</p>
@@ -75,22 +97,25 @@ function FilteredEventsPage() {
 
   if (!filteredEvents || filteredEvents.length === 0) {
     return (
-      <div>
-        <ErrorAlert>
-          <p>No event found for the chosen filter!</p>
-        </ErrorAlert>
-        <div className="center">
-          <Button link="/events">Show all events</Button>
+      <>
+        {pageHeadData}
+        <div>
+          <ErrorAlert>
+            <p>No event found for the chosen filter!</p>
+          </ErrorAlert>
+          <div className="center">
+            <Button link="/events">Show all events</Button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   const selectedDate = new Date(filteredYear, filteredMonth - 1);
-  console.log('selectedDate: ', selectedDate);
 
   return (
     <>
+      {pageHeadData}
       <ResultsTitle date={selectedDate} />
       <EventList list={filteredEvents} />
     </>
