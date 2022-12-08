@@ -3,15 +3,15 @@ import { useRef } from 'react';
 import Button from '../ui/button';
 import classes from './events-search.module.css';
 
-const EventsSearch = ({ onSearch }) => {
-  const monthInputRef = useRef();
-  const yearInputRef = useRef();
+const EventsSearch = ({ onSearch }: any) => {
+  const monthInputRef = useRef(null);
+  const yearInputRef = useRef(null);
 
-  const submitHandler = (e) => {
+  const submitHandler = (e: any) => {
     e.preventDefault();
 
-    const selectedYear = yearInputRef.current.value;
-    const selectedMonth = monthInputRef.current.value;
+    const selectedYear = yearInputRef?.current?.['value'];
+    const selectedMonth = monthInputRef.current?.['value'];
 
     onSearch(selectedYear, selectedMonth);
   };
