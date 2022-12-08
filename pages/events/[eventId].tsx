@@ -1,10 +1,10 @@
 import React from 'react';
+import Head from 'next/head';
 
 import { getFeaturedEvents, getEventById } from '../../helpers/api-utils';
 import EventSummary from '../../components/event-detail/event-summary';
 import EventLogistics from '../../components/event-detail/event-logistics';
 import EventContent from '../../components/event-detail/event-content';
-import ErrorAlert from '../../components/ui/error-alert';
 
 function EventDetailPage({ selectedEvent }: any) {
   const event = selectedEvent;
@@ -19,6 +19,10 @@ function EventDetailPage({ selectedEvent }: any) {
 
   return (
     <>
+      <Head>
+        <title>{event.title}</title>
+        <meta name="description" content={event.description} />
+      </Head>
       <EventSummary title={event.title} />
       <EventLogistics
         date={event.date}
